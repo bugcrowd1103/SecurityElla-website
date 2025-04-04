@@ -2,10 +2,11 @@ import {
   users, type User, type InsertUser,
   courses, type Course, type InsertCourse,
   contactMessages, type ContactMessage, type InsertContactMessage,
-  blogPosts, type BlogPost, type InsertBlogPost
+  blogPosts, type BlogPost, type InsertBlogPost,
+  courseMilestones, type CourseMilestone, type InsertCourseMilestone
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -16,6 +17,10 @@ export interface IStorage {
   getCourseById(id: number): Promise<Course | undefined>;
   getFeaturedCourses(): Promise<Course[]>;
   createCourse(course: InsertCourse): Promise<Course>;
+  
+  getCourseMilestones(courseId: number): Promise<CourseMilestone[]>;
+  getCourseMilestoneById(id: number): Promise<CourseMilestone | undefined>;
+  createCourseMilestone(milestone: InsertCourseMilestone): Promise<CourseMilestone>;
   
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   
@@ -66,6 +71,31 @@ export class DatabaseStorage implements IStorage {
       .values(insertCourse)
       .returning();
     return course;
+  }
+
+  // Course milestone methods
+  async getCourseMilestones(courseId: number): Promise<CourseMilestone[]> {
+    return await db
+      .select()
+      .from(courseMilestones)
+      .where(eq(courseMilestones.courseId, courseId))
+      .orderBy(asc(courseMilestones.order));
+  }
+
+  async getCourseMilestoneById(id: number): Promise<CourseMilestone | undefined> {
+    const [milestone] = await db
+      .select()
+      .from(courseMilestones)
+      .where(eq(courseMilestones.id, id));
+    return milestone || undefined;
+  }
+
+  async createCourseMilestone(insertMilestone: InsertCourseMilestone): Promise<CourseMilestone> {
+    const [milestone] = await db
+      .insert(courseMilestones)
+      .values(insertMilestone)
+      .returning();
+    return milestone;
   }
 
   // Contact message methods
@@ -268,6 +298,62 @@ export class DatabaseStorage implements IStorage {
 
       for (const post of sampleBlogPosts) {
         await this.createBlogPost(post);
+      }
+      
+      // Initialize with sample course milestones for the first course
+      const milestonesCount = await db.select().from(courseMilestones).execute();
+      if (milestonesCount.length === 0) {
+        const firstCourse = await db.select().from(courses).limit(1);
+        if (firstCourse.length > 0) {
+          const courseId = firstCourse[0].id;
+          
+          const sampleMilestones: InsertCourseMilestone[] = [
+            {
+              courseId,
+              title: "Security Basics Mastered",
+              description: "Completed the core fundamentals of cybersecurity principles and practices.",
+              order: 1,
+              shareableText: "I've mastered the security basics in the Cybersecurity Fundamentals course @Securityella! #CyberSecurity #Learning",
+              achievementBadge: "/images/badges/security-basics.svg"
+            },
+            {
+              courseId,
+              title: "Network Defender",
+              description: "Successfully completed all network security modules and practical exercises.",
+              order: 2,
+              shareableText: "Proud to be a certified Network Defender after completing this module @Securityella! #NetworkSecurity #CyberDefense",
+              achievementBadge: "/images/badges/network-defender.svg"
+            },
+            {
+              courseId,
+              title: "Encryption Expert",
+              description: "Demonstrated proficiency in encryption techniques and secure communications.",
+              order: 3,
+              shareableText: "Just became an Encryption Expert in my cybersecurity journey @Securityella! #Encryption #DataSecurity",
+              achievementBadge: "/images/badges/encryption-expert.svg"
+            },
+            {
+              courseId,
+              title: "Threat Hunter",
+              description: "Learned to identify and mitigate various cybersecurity threats and vulnerabilities.",
+              order: 4,
+              shareableText: "Now I can spot cyber threats like a pro! Completed the Threat Hunter module @Securityella #ThreatHunting #Cybersecurity",
+              achievementBadge: "/images/badges/threat-hunter.svg"
+            },
+            {
+              courseId,
+              title: "Cybersecurity Fundamentals Graduate",
+              description: "Successfully completed the entire Cybersecurity Fundamentals course with all assessments.",
+              order: 5,
+              shareableText: "I did it! Graduated from the Cybersecurity Fundamentals course @Securityella! Ready to protect the digital world. #CyberGrad #NewSkills",
+              achievementBadge: "/images/badges/cyber-graduate.svg"
+            }
+          ];
+          
+          for (const milestone of sampleMilestones) {
+            await this.createCourseMilestone(milestone);
+          }
+        }
       }
     }
   }

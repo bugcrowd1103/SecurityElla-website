@@ -9,6 +9,7 @@ import { Helmet } from "react-helmet";
 import { ArrowLeft, Clock, DollarSign, Layers, Award, Flag } from "lucide-react";
 import type { Course } from "@shared/schema";
 import EnrollmentModal from "@/components/courses/EnrollmentModal";
+import CourseMilestoneList from "@/components/courses/CourseMilestoneList";
 
 export default function CourseDetail() {
   const params = useParams();
@@ -148,6 +149,11 @@ export default function CourseDetail() {
                     </li>
                   ) : null}
                 </ul>
+                
+                {/* Course Milestones */}
+                {parseInt(courseId || "0") > 0 && (
+                  <CourseMilestoneList courseId={parseInt(courseId || "0")} />
+                )}
               </div>
             </div>
 

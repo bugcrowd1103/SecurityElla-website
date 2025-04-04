@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertContactMessageSchema, insertBlogPostSchema } from "@shared/schema";
+import { insertUserSchema, insertContactMessageSchema, insertBlogPostSchema, insertCourseMilestoneSchema } from "@shared/schema";
 import express from "express";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -39,6 +39,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(course);
     } catch (error) {
       res.status(500).json({ message: "Error fetching course" });
+    }
+  });
+  
+  // Course milestone routes
+  apiRouter.get("/courses/:courseId/milestones", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const course = await storage.getCourseById(courseId);
+      
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      
+      const milestones = await storage.getCourseMilestones(courseId);
+      res.json(milestones);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching course milestones" });
+    }
+  });
+  
+  apiRouter.get("/milestones/:id", async (req, res) => {
+    try {
+      const milestoneId = parseInt(req.params.id);
+      const milestone = await storage.getCourseMilestoneById(milestoneId);
+      
+      if (!milestone) {
+        return res.status(404).json({ message: "Milestone not found" });
+      }
+      
+      res.json(milestone);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching milestone" });
+    }
+  });
+  
+  apiRouter.post("/courses/:courseId/milestones", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const course = await storage.getCourseById(courseId);
+      
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      
+      const milestoneData = { ...req.body, courseId };
+      const validatedData = insertCourseMilestoneSchema.parse(milestoneData);
+      const newMilestone = await storage.createCourseMilestone(validatedData);
+      
+      res.status(201).json(newMilestone);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create milestone" });
+      }
     }
   });
 

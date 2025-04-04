@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -38,6 +38,28 @@ export const insertCourseSchema = createInsertSchema(courses).pick({
   duration: true,
   imagePath: true,
   featured: true,
+});
+
+export const courseMilestones = pgTable("course_milestones", {
+  id: serial("id").primaryKey(),
+  courseId: integer("course_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  order: integer("order").notNull(),
+  imagePath: text("image_path"),
+  achievementBadge: text("achievement_badge"),
+  shareableText: text("shareable_text").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCourseMilestoneSchema = createInsertSchema(courseMilestones).pick({
+  courseId: true,
+  title: true,
+  description: true,
+  order: true,
+  imagePath: true,
+  achievementBadge: true,
+  shareableText: true,
 });
 
 export const contactMessages = pgTable("contact_messages", {
@@ -89,3 +111,6 @@ export type ContactMessage = typeof contactMessages.$inferSelect;
 
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
+
+export type InsertCourseMilestone = z.infer<typeof insertCourseMilestoneSchema>;
+export type CourseMilestone = typeof courseMilestones.$inferSelect;
