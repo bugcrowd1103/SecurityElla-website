@@ -38,10 +38,10 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
         key={1}
         href="#"
         className={cn(
-          "relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium",
+          "relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium",
           currentPage === 1
-            ? "bg-[#0a192f] text-[#64ffda]"
-            : "bg-[#1e1e1e] text-gray-300 hover:bg-[#172a46]"
+            ? "bg-blue-600 text-white"
+            : "bg-white text-gray-700 hover:bg-gray-50"
         )}
         onClick={(e) => {
           e.preventDefault();
@@ -60,7 +60,7 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
       pageNumbers.push(
         <span
           key="ellipsis-start"
-          className="relative inline-flex items-center px-4 py-2 border border-gray-700 bg-[#1e1e1e] text-sm font-medium text-gray-500"
+          className="relative inline-flex items-center px-4 py-2 border border-gray-200 bg-white text-sm font-medium text-gray-500"
         >
           ...
         </span>
@@ -74,10 +74,10 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
           key={i}
           href="#"
           className={cn(
-            "relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium",
+            "relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium",
             currentPage === i
-              ? "bg-[#0a192f] text-[#64ffda]"
-              : "bg-[#1e1e1e] text-gray-300 hover:bg-[#172a46]"
+              ? "bg-blue-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-50"
           )}
           onClick={(e) => {
             e.preventDefault();
@@ -94,7 +94,7 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
       pageNumbers.push(
         <span
           key="ellipsis-end"
-          className="relative inline-flex items-center px-4 py-2 border border-gray-700 bg-[#1e1e1e] text-sm font-medium text-gray-500"
+          className="relative inline-flex items-center px-4 py-2 border border-gray-200 bg-white text-sm font-medium text-gray-500"
         >
           ...
         </span>
@@ -108,10 +108,10 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
           key={totalPages}
           href="#"
           className={cn(
-            "relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium",
+            "relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium",
             currentPage === totalPages
-              ? "bg-[#0a192f] text-[#64ffda]"
-              : "bg-[#1e1e1e] text-gray-300 hover:bg-[#172a46]"
+              ? "bg-blue-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-50"
           )}
           onClick={(e) => {
             e.preventDefault();
@@ -134,7 +134,7 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
       <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
         <a
           href="#"
-          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-700 bg-[#1e1e1e] text-sm font-medium text-gray-300 hover:bg-[#172a46]"
+          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           onClick={(e) => {
             e.preventDefault();
             handlePageClick(currentPage - 1);
@@ -148,7 +148,7 @@ const CoursePagination: React.FC<CoursePaginationProps> = ({
         
         <a
           href="#"
-          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-700 bg-[#1e1e1e] text-sm font-medium text-gray-300 hover:bg-[#172a46]"
+          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           onClick={(e) => {
             e.preventDefault();
             handlePageClick(currentPage + 1);

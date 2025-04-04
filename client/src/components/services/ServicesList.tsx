@@ -64,7 +64,7 @@ const ServicesList = () => {
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
         <motion.h2 
-          className="text-3xl font-bold font-['Poppins',sans-serif] text-white"
+          className="text-3xl font-bold font-['Poppins',sans-serif] text-gray-800"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -73,14 +73,14 @@ const ServicesList = () => {
           Our Services
         </motion.h2>
         <motion.div 
-          className="h-1 w-20 bg-[#64ffda] mx-auto mt-4 rounded-full"
+          className="h-1 w-20 bg-blue-600 mx-auto mt-4 rounded-full"
           initial={{ width: 0 }}
           whileInView={{ width: 80 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         />
         <motion.p 
-          className="mt-4 text-lg text-gray-300 max-w-3xl mx-auto"
+          className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -99,18 +99,18 @@ const ServicesList = () => {
       >
         {services.map((service, index) => (
           <motion.div key={index} className="flex items-start" variants={item}>
-            <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-md bg-[#0a192f] text-[#64ffda] text-xl">
+            <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-md bg-blue-100 text-blue-600 text-xl">
               <i className={service.icon}></i>
             </div>
             <div className="ml-6">
-              <h3 className="text-xl font-bold font-['Poppins',sans-serif] text-white">{service.title}</h3>
-              <p className="mt-2 text-gray-300">
+              <h3 className="text-xl font-bold font-['Poppins',sans-serif] text-gray-800">{service.title}</h3>
+              <p className="mt-2 text-gray-600">
                 {service.description}
               </p>
               <ul className="mt-4 space-y-2">
                 {service.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center text-gray-300">
-                    <i className="fas fa-check text-[#64ffda] mr-2"></i>
+                  <li key={idx} className="flex items-center text-gray-600">
+                    <i className="fas fa-check text-blue-600 mr-2"></i>
                     {feature}
                   </li>
                 ))}
@@ -121,20 +121,20 @@ const ServicesList = () => {
       </motion.div>
       
       <motion.div 
-        className="mt-16 bg-[#172a46] rounded-2xl p-8 shadow-lg"
+        className="mt-16 bg-blue-50 rounded-2xl p-8 shadow-lg border border-blue-100"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <div className="max-w-3xl mx-auto text-center">
-          <h3 className="text-2xl font-bold font-['Poppins',sans-serif] text-white">Ready to strengthen your security posture?</h3>
-          <p className="mt-4 text-gray-300">
+          <h3 className="text-2xl font-bold font-['Poppins',sans-serif] text-gray-800">Ready to strengthen your security posture?</h3>
+          <p className="mt-4 text-gray-600">
             Our team of cybersecurity experts is ready to help you protect your digital assets and build a resilient security strategy.
           </p>
           <div className="mt-8">
             <Button 
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-[#0a192f] bg-[#64ffda] hover:bg-[#00c4a7] transition duration-300"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-300"
             >
               Get a Free Consultation
             </Button>

@@ -39,12 +39,12 @@ const Courses = () => {
     }
     
     // Apply level filter
-    if (filters.level) {
+    if (filters.level && filters.level !== 'all') {
       result = result.filter(course => course.level === filters.level);
     }
     
     // Apply price range filter
-    if (filters.priceRange) {
+    if (filters.priceRange && filters.priceRange !== 'all') {
       switch (filters.priceRange) {
         case "0-10000":
           result = result.filter(course => course.priceInr <= 10000);
@@ -85,11 +85,11 @@ const Courses = () => {
         <title>Our Courses | SecurityElla</title>
         <meta name="description" content="Advance your cybersecurity career with our comprehensive range of specialized courses." />
       </Helmet>
-      <section id="courses-section" className="bg-[#121212] py-16 px-4 sm:px-6 lg:px-8">
+      <section id="courses-section" className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2 
-              className="text-3xl font-bold font-['Poppins',sans-serif] text-white"
+              className="text-3xl font-bold font-['Poppins',sans-serif] text-gray-800"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -97,13 +97,13 @@ const Courses = () => {
               Our Courses
             </motion.h2>
             <motion.div 
-              className="h-1 w-20 bg-[#64ffda] mx-auto mt-4 rounded-full"
+              className="h-1 w-20 bg-blue-600 mx-auto mt-4 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: 80 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             />
             <motion.p 
-              className="mt-4 text-lg text-gray-300 max-w-3xl mx-auto"
+              className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -117,14 +117,14 @@ const Courses = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-lg h-[250px] animate-pulse">
+                <div key={i} className="bg-white rounded-xl overflow-hidden shadow-lg h-[250px] animate-pulse">
                   <div className="p-6">
-                    <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
-                    <div className="h-6 bg-gray-700 rounded w-3/4 mb-4"></div>
-                    <div className="h-4 bg-gray-700 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-700 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-700 rounded w-2/3 mb-2"></div>
-                    <div className="h-8 bg-gray-700 rounded w-1/3 mt-4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-1/3 mt-4"></div>
                   </div>
                 </div>
               ))}
@@ -134,8 +134,8 @@ const Courses = () => {
               <p>Error loading courses. Please try again later.</p>
             </div>
           ) : filteredCourses.length === 0 ? (
-            <div className="text-center text-gray-300 py-12">
-              <i className="fas fa-search text-5xl mb-4 text-[#64ffda]"></i>
+            <div className="text-center text-gray-600 py-12">
+              <i className="fas fa-search text-5xl mb-4 text-blue-600"></i>
               <h3 className="text-xl font-bold mb-2">No courses found</h3>
               <p>Try adjusting your search filters</p>
             </div>

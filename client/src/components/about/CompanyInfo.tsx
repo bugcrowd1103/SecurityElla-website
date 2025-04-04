@@ -9,9 +9,9 @@ const CompanyInfo = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <div className="prose prose-lg text-gray-300 max-w-none">
+        <div className="prose prose-lg text-gray-600 max-w-none">
           <p className="mb-4">
-            <span className="text-[#64ffda] font-bold">SecurityElla</span> is a leading cybersecurity company dedicated to providing cutting-edge security solutions and comprehensive training programs to individuals and organizations worldwide.
+            <span className="text-blue-600 font-bold">SecurityElla</span> is a leading cybersecurity company dedicated to providing cutting-edge security solutions and comprehensive training programs to individuals and organizations worldwide.
           </p>
           <p className="mb-4">
             Founded in 2015 by a team of cybersecurity experts with decades of combined experience, we've quickly established ourselves as an industry leader with a reputation for excellence and innovation.
@@ -25,16 +25,16 @@ const CompanyInfo = () => {
         </div>
         
         <div className="mt-8 flex space-x-6">
-          <a href="#" className="text-gray-400 hover:text-[#64ffda] transition-colors duration-300">
+          <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors duration-300">
             <i className="fab fa-linkedin text-2xl"></i>
           </a>
-          <a href="#" className="text-gray-400 hover:text-[#64ffda] transition-colors duration-300">
+          <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors duration-300">
             <i className="fab fa-twitter text-2xl"></i>
           </a>
-          <a href="#" className="text-gray-400 hover:text-[#64ffda] transition-colors duration-300">
+          <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors duration-300">
             <i className="fab fa-facebook text-2xl"></i>
           </a>
-          <a href="#" className="text-gray-400 hover:text-[#64ffda] transition-colors duration-300">
+          <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors duration-300">
             <i className="fab fa-instagram text-2xl"></i>
           </a>
         </div>
@@ -47,23 +47,23 @@ const CompanyInfo = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <div className="rounded-lg overflow-hidden shadow-lg bg-[#1e1e1e]">
-          <div className="w-full h-64 flex items-center justify-center bg-[#172a46] text-[#64ffda]">
+        <div className="rounded-lg overflow-hidden shadow-lg bg-white">
+          <div className="w-full h-64 flex items-center justify-center bg-blue-50 text-blue-600">
             <i className="fas fa-users text-7xl"></i>
           </div>
         </div>
-        <div className="rounded-lg overflow-hidden shadow-lg bg-[#1e1e1e]">
-          <div className="w-full h-64 flex items-center justify-center bg-[#172a46] text-[#64ffda]">
+        <div className="rounded-lg overflow-hidden shadow-lg bg-white">
+          <div className="w-full h-64 flex items-center justify-center bg-blue-50 text-blue-600">
             <i className="fas fa-chalkboard-teacher text-7xl"></i>
           </div>
         </div>
-        <div className="rounded-lg overflow-hidden shadow-lg bg-[#1e1e1e]">
-          <div className="w-full h-64 flex items-center justify-center bg-[#172a46] text-[#64ffda]">
+        <div className="rounded-lg overflow-hidden shadow-lg bg-white">
+          <div className="w-full h-64 flex items-center justify-center bg-blue-50 text-blue-600">
             <i className="fas fa-shield-alt text-7xl"></i>
           </div>
         </div>
-        <div className="rounded-lg overflow-hidden shadow-lg bg-[#1e1e1e]">
-          <div className="w-full h-64 flex items-center justify-center bg-[#172a46] text-[#64ffda]">
+        <div className="rounded-lg overflow-hidden shadow-lg bg-white">
+          <div className="w-full h-64 flex items-center justify-center bg-blue-50 text-blue-600">
             <i className="fas fa-laptop-code text-7xl"></i>
           </div>
         </div>

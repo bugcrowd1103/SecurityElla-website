@@ -20,49 +20,49 @@ const Header = () => {
   };
 
   return (
-    <nav className="bg-[#0a192f] sticky top-0 z-50 shadow-md">
+    <nav className="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
-                <span className="text-[#64ffda] font-['Poppins',sans-serif] font-bold text-2xl cursor-pointer">
-                  Security<span className="text-[#38b2ff]">Ella</span>
+                <span className="text-blue-600 font-['Poppins',sans-serif] font-bold text-2xl cursor-pointer">
+                  Security<span className="text-gray-800">Ella</span>
                 </span>
               </Link>
             </div>
             <div className="hidden sm:ml-10 sm:flex sm:items-center sm:space-x-8">
               <Link href="/">
-                <a className={cn(
-                  "px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                  isActive("/") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                <span className={cn(
+                  "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                  isActive("/") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
                 )}>
                   Home
-                </a>
+                </span>
               </Link>
               <Link href="/services">
-                <a className={cn(
-                  "px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                  isActive("/services") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                <span className={cn(
+                  "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                  isActive("/services") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
                 )}>
                   Services
-                </a>
+                </span>
               </Link>
               <Link href="/courses">
-                <a className={cn(
-                  "px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                  isActive("/courses") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                <span className={cn(
+                  "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                  isActive("/courses") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
                 )}>
                   Courses
-                </a>
+                </span>
               </Link>
               <Link href="/about">
-                <a className={cn(
-                  "px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                  isActive("/about") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                <span className={cn(
+                  "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                  isActive("/about") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
                 )}>
                   About
-                </a>
+                </span>
               </Link>
             </div>
           </div>
@@ -70,7 +70,7 @@ const Header = () => {
           <div className="hidden sm:flex sm:items-center">
             <Link href="/login">
               <Button 
-                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-[#0a192f] bg-[#64ffda] hover:bg-[#00c4a7] transition duration-300 ease-in-out"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out"
               >
                 Login
               </Button>
@@ -80,7 +80,7 @@ const Header = () => {
           <div className="flex items-center sm:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-[#172a46] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#64ffda]"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-blue-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
               onClick={toggleMobileMenu}
             >
               <i className="fas fa-bars"></i>
@@ -90,61 +90,61 @@ const Header = () => {
       </div>
       
       <div className={`sm:hidden ${mobileMenuOpen ? '' : 'hidden'}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="px-2 pt-2 pb-3 space-y-1 bg-white">
           <Link href="/">
-            <a 
+            <span 
               className={cn(
-                "block px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                isActive("/") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
               )}
               onClick={closeMobileMenu}
             >
               Home
-            </a>
+            </span>
           </Link>
           <Link href="/services">
-            <a 
+            <span 
               className={cn(
-                "block px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                isActive("/services") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/services") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
               )}
               onClick={closeMobileMenu}
             >
               Services
-            </a>
+            </span>
           </Link>
           <Link href="/courses">
-            <a 
+            <span 
               className={cn(
-                "block px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                isActive("/courses") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/courses") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
               )}
               onClick={closeMobileMenu}
             >
               Courses
-            </a>
+            </span>
           </Link>
           <Link href="/about">
-            <a 
+            <span 
               className={cn(
-                "block px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                isActive("/about") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/about") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
               )}
               onClick={closeMobileMenu}
             >
               About
-            </a>
+            </span>
           </Link>
           <Link href="/login">
-            <a 
+            <span 
               className={cn(
-                "block px-3 py-2 text-gray-200 transition duration-300 ease-in-out font-medium",
-                isActive("/login") ? "text-[#64ffda]" : "hover:text-[#64ffda]"
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/login") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
               )}
               onClick={closeMobileMenu}
             >
               Login
-            </a>
+            </span>
           </Link>
         </div>
       </div>

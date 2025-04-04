@@ -52,7 +52,7 @@ const CourseFilter: React.FC<CourseFilterProps> = ({ onFilterChange }) => {
 
   return (
     <motion.div 
-      className="mb-8 bg-[#1e1e1e] rounded-xl p-6 shadow-md"
+      className="mb-8 bg-white rounded-xl p-6 shadow-md border border-gray-100"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -63,7 +63,7 @@ const CourseFilter: React.FC<CourseFilterProps> = ({ onFilterChange }) => {
             <Input
               type="text"
               placeholder="Search courses..."
-              className="w-full px-4 py-2 bg-[#121212] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#64ffda] text-gray-200 pr-10"
+              className="w-full px-4 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-700 pr-10"
               value={search}
               onChange={handleSearchChange}
             />
@@ -74,11 +74,11 @@ const CourseFilter: React.FC<CourseFilterProps> = ({ onFilterChange }) => {
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <Select value={level} onValueChange={handleLevelChange}>
-            <SelectTrigger className="w-[200px] bg-[#121212] border border-gray-700">
+            <SelectTrigger className="w-[200px] bg-white border border-gray-200">
               <SelectValue placeholder="All Levels" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1e1e1e] border border-gray-700">
-              <SelectItem value="">All Levels</SelectItem>
+            <SelectContent className="bg-white border border-gray-200">
+              <SelectItem value="all">All Levels</SelectItem>
               <SelectItem value="Beginner">Beginner</SelectItem>
               <SelectItem value="Intermediate">Intermediate</SelectItem>
               <SelectItem value="Advanced">Advanced</SelectItem>
@@ -87,11 +87,11 @@ const CourseFilter: React.FC<CourseFilterProps> = ({ onFilterChange }) => {
           </Select>
           
           <Select value={priceRange} onValueChange={handlePriceRangeChange}>
-            <SelectTrigger className="w-[200px] bg-[#121212] border border-gray-700">
+            <SelectTrigger className="w-[200px] bg-white border border-gray-200">
               <SelectValue placeholder="Price Range" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1e1e1e] border border-gray-700">
-              <SelectItem value="">All Prices</SelectItem>
+            <SelectContent className="bg-white border border-gray-200">
+              <SelectItem value="all">All Prices</SelectItem>
               <SelectItem value="0-10000">₹0 - ₹10,000</SelectItem>
               <SelectItem value="10000-15000">₹10,000 - ₹15,000</SelectItem>
               <SelectItem value="15000+">₹15,000+</SelectItem>
