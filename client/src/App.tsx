@@ -11,6 +11,8 @@ import NotFound from "./pages/not-found";
 import Blog from "./pages/blog";
 import BlogPost from "./pages/blog-post";
 import Contact from "./pages/contact";
+import Checkout from "./pages/checkout";
+import PaymentSuccess from "./pages/payment-success";
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="/blog" component={Blog} />
           <Route path="/blog/:id" component={BlogPost} />
           <Route path="/contact" component={Contact} />
+          <Route path="/checkout" component={Checkout} />
+          <Route path="/payment-success" component={PaymentSuccess} />
           <Route component={NotFound} />
         </Switch>
       </main>

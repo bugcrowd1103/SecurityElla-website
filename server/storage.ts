@@ -3,27 +3,63 @@ import {
   courses, type Course, type InsertCourse,
   contactMessages, type ContactMessage, type InsertContactMessage,
   blogPosts, type BlogPost, type InsertBlogPost,
-  courseMilestones, type CourseMilestone, type InsertCourseMilestone
+  courseMilestones, type CourseMilestone, type InsertCourseMilestone,
+  courseEnrollments, type CourseEnrollment, type InsertCourseEnrollment,
+  userMilestoneProgress, type UserMilestoneProgress, type InsertUserMilestoneProgress,
+  courseContent, type CourseContent, type InsertCourseContent
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, and, like, inArray, sql, or } from "drizzle-orm";
 
 export interface IStorage {
+  // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, userData: Partial<InsertUser>): Promise<User>;
+  updateUserXp(userId: number, xpToAdd: number): Promise<User>;
+  updateUserLevel(userId: number, newLevel: number): Promise<User>;
+  updateUserBadges(userId: number, badges: any[]): Promise<User>;
+  updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User>;
+  updateStripeSubscriptionId(userId: number, stripeSubscriptionId: string): Promise<User>;
+  updateUserStripeInfo(userId: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User>;
   
+  // Course methods
   getAllCourses(): Promise<Course[]>;
   getCourseById(id: number): Promise<Course | undefined>;
   getFeaturedCourses(): Promise<Course[]>;
+  getRecommendedCourses(userId: number, limit?: number): Promise<Course[]>;
+  searchCourses(query: string, filters?: any): Promise<Course[]>;
   createCourse(course: InsertCourse): Promise<Course>;
   
+  // Course milestone methods
   getCourseMilestones(courseId: number): Promise<CourseMilestone[]>;
   getCourseMilestoneById(id: number): Promise<CourseMilestone | undefined>;
   createCourseMilestone(milestone: InsertCourseMilestone): Promise<CourseMilestone>;
   
+  // Course enrollment methods
+  enrollUserInCourse(enrollment: InsertCourseEnrollment): Promise<CourseEnrollment>;
+  getUserEnrollments(userId: number): Promise<CourseEnrollment[]>;
+  getCourseEnrollments(courseId: number): Promise<CourseEnrollment[]>;
+  getUserCourses(userId: number): Promise<Course[]>;
+  updateEnrollmentProgress(enrollmentId: number, progress: number): Promise<CourseEnrollment>;
+  updateEnrollmentStatus(enrollmentId: number, status: string): Promise<CourseEnrollment>;
+  isUserEnrolledInCourse(userId: number, courseId: number): Promise<boolean>;
+  
+  // User progress methods
+  getUserMilestoneProgress(userId: number, milestoneId: number): Promise<UserMilestoneProgress | undefined>;
+  updateUserMilestoneProgress(userId: number, milestoneId: number, completed: boolean, xpEarned?: number): Promise<UserMilestoneProgress>;
+  getUserCompletedMilestones(userId: number, courseId: number): Promise<number[]>;
+  
+  // Course content methods
+  getCourseContent(courseId: number): Promise<CourseContent[]>;
+  getCourseContentById(id: number): Promise<CourseContent | undefined>;
+  createCourseContent(content: InsertCourseContent): Promise<CourseContent>;
+  
+  // Contact message methods
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   
+  // Blog post methods
   getAllBlogPosts(): Promise<BlogPost[]>;
   getBlogPostById(id: number): Promise<BlogPost | undefined>;
   getRecentBlogPosts(limit: number): Promise<BlogPost[]>;
@@ -50,6 +86,91 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+  
+  async updateUserXp(userId: number, xpToAdd: number): Promise<User> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) throw new Error("User not found");
+    
+    const currentXp = user.xpPoints || 0;
+    const newXp = currentXp + xpToAdd;
+    
+    // Check if user should level up
+    const currentLevel = user.level || 1;
+    let newLevel = currentLevel;
+    
+    // Simple level up formula: each level requires level*100 XP
+    if (newXp >= currentLevel * 100) {
+      newLevel = Math.floor(newXp / 100) + 1;
+    }
+    
+    const [updatedUser] = await db
+      .update(users)
+      .set({ 
+        xpPoints: newXp,
+        level: newLevel
+      })
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return updatedUser;
+  }
+  
+  async updateUserLevel(userId: number, newLevel: number): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ level: newLevel })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async updateUserBadges(userId: number, badges: any[]): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ badges: badges })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async updateStripeSubscriptionId(userId: number, stripeSubscriptionId: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ stripeSubscriptionId })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+  
+  async updateUserStripeInfo(userId: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        stripeCustomerId: stripeInfo.stripeCustomerId,
+        stripeSubscriptionId: stripeInfo.stripeSubscriptionId
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
 
   // Course methods
   async getAllCourses(): Promise<Course[]> {
@@ -71,6 +192,100 @@ export class DatabaseStorage implements IStorage {
       .values(insertCourse)
       .returning();
     return course;
+  }
+  
+  async getRecommendedCourses(userId: number, limit: number = 3): Promise<Course[]> {
+    // In a real implementation, this would use user preferences, past enrollments, and machine learning
+    // For simplicity, we'll get courses matching the user's level first, then get random ones if needed
+    
+    // Get user's level from their profile to determine appropriate course difficulty
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    
+    if (!user) {
+      return this.getFeaturedCourses(); // Fallback to featured courses
+    }
+    
+    // Get courses the user is already enrolled in to exclude them
+    const enrolledCourseIds = await this.getUserEnrollments(userId)
+      .then(enrollments => enrollments.map(e => e.courseId));
+    
+    // Determine appropriate course level based on user experience
+    let recommendedLevel = "Beginner";
+    if (user.level && user.level >= 5) {
+      recommendedLevel = "Advanced";
+    } else if (user.level && user.level >= 3) {
+      recommendedLevel = "Intermediate";
+    }
+    
+    // Get courses matching the user's experience level that they're not enrolled in
+    let recommendedCourses = await db.select()
+      .from(courses)
+      .where(
+        and(
+          eq(courses.level, recommendedLevel),
+          !enrolledCourseIds.length ? sql`TRUE` : sql`${courses.id} NOT IN (${enrolledCourseIds.join(',')})`
+        )
+      )
+      .limit(limit);
+    
+    // If we don't have enough courses, get more from other levels
+    if (recommendedCourses.length < limit) {
+      const remainingLimit = limit - recommendedCourses.length;
+      const additionalCourses = await db.select()
+        .from(courses)
+        .where(
+          and(
+            !enrolledCourseIds.length ? sql`TRUE` : sql`${courses.id} NOT IN (${enrolledCourseIds.join(',')})`,
+            sql`${courses.id} NOT IN (${recommendedCourses.map(c => c.id).join(',')})`
+          )
+        )
+        .limit(remainingLimit);
+        
+      recommendedCourses = [...recommendedCourses, ...additionalCourses];
+    }
+    
+    return recommendedCourses;
+  }
+  
+  async searchCourses(query: string, filters: any = {}): Promise<Course[]> {
+    // Start with a base query
+    let coursesQuery = db.select().from(courses);
+    
+    // Add search condition if query is provided
+    if (query) {
+      coursesQuery = coursesQuery.where(
+        or(
+          like(courses.title, `%${query}%`),
+          like(courses.description, `%${query}%`)
+        )
+      );
+    }
+    
+    // Add filters
+    if (filters.level) {
+      if (Array.isArray(filters.level)) {
+        coursesQuery = coursesQuery.where(inArray(courses.level, filters.level));
+      } else {
+        coursesQuery = coursesQuery.where(eq(courses.level, filters.level));
+      }
+    }
+    
+    // Add price range filter
+    if (filters.minPrice !== undefined) {
+      coursesQuery = coursesQuery.where(sql`${courses.priceUsd} >= ${filters.minPrice}`);
+    }
+    
+    if (filters.maxPrice !== undefined) {
+      coursesQuery = coursesQuery.where(sql`${courses.priceUsd} <= ${filters.maxPrice}`);
+    }
+    
+    // Add featured filter
+    if (filters.featured !== undefined) {
+      coursesQuery = coursesQuery.where(eq(courses.featured, filters.featured));
+    }
+    
+    // Execute the query
+    return await coursesQuery;
   }
 
   // Course milestone methods
@@ -96,6 +311,189 @@ export class DatabaseStorage implements IStorage {
       .values(insertMilestone)
       .returning();
     return milestone;
+  }
+  
+  // Course enrollment methods
+  async enrollUserInCourse(enrollment: InsertCourseEnrollment): Promise<CourseEnrollment> {
+    const [newEnrollment] = await db
+      .insert(courseEnrollments)
+      .values(enrollment)
+      .returning();
+    return newEnrollment;
+  }
+  
+  async getUserEnrollments(userId: number): Promise<CourseEnrollment[]> {
+    return await db
+      .select()
+      .from(courseEnrollments)
+      .where(eq(courseEnrollments.userId, userId));
+  }
+  
+  async getCourseEnrollments(courseId: number): Promise<CourseEnrollment[]> {
+    return await db
+      .select()
+      .from(courseEnrollments)
+      .where(eq(courseEnrollments.courseId, courseId));
+  }
+  
+  async getUserCourses(userId: number): Promise<Course[]> {
+    const enrollments = await this.getUserEnrollments(userId);
+    const courseIds = enrollments.map(e => e.courseId);
+    
+    if (courseIds.length === 0) {
+      return [];
+    }
+    
+    return await db
+      .select()
+      .from(courses)
+      .where(inArray(courses.id, courseIds));
+  }
+  
+  async updateEnrollmentProgress(enrollmentId: number, progress: number): Promise<CourseEnrollment> {
+    const [updatedEnrollment] = await db
+      .update(courseEnrollments)
+      .set({ progress })
+      .where(eq(courseEnrollments.id, enrollmentId))
+      .returning();
+    
+    return updatedEnrollment;
+  }
+  
+  async updateEnrollmentStatus(enrollmentId: number, status: string): Promise<CourseEnrollment> {
+    const [updatedEnrollment] = await db
+      .update(courseEnrollments)
+      .set({ status })
+      .where(eq(courseEnrollments.id, enrollmentId))
+      .returning();
+    
+    return updatedEnrollment;
+  }
+  
+  async isUserEnrolledInCourse(userId: number, courseId: number): Promise<boolean> {
+    const results = await db
+      .select()
+      .from(courseEnrollments)
+      .where(
+        and(
+          eq(courseEnrollments.userId, userId),
+          eq(courseEnrollments.courseId, courseId)
+        )
+      );
+    
+    return results.length > 0;
+  }
+  
+  // User progress methods
+  async getUserMilestoneProgress(userId: number, milestoneId: number): Promise<UserMilestoneProgress | undefined> {
+    const [progress] = await db
+      .select()
+      .from(userMilestoneProgress)
+      .where(
+        and(
+          eq(userMilestoneProgress.userId, userId),
+          eq(userMilestoneProgress.milestoneId, milestoneId)
+        )
+      );
+    
+    return progress;
+  }
+  
+  async updateUserMilestoneProgress(
+    userId: number, 
+    milestoneId: number, 
+    completed: boolean, 
+    xpEarned: number = 10
+  ): Promise<UserMilestoneProgress> {
+    const existingProgress = await this.getUserMilestoneProgress(userId, milestoneId);
+    
+    if (existingProgress) {
+      const [updatedProgress] = await db
+        .update(userMilestoneProgress)
+        .set({ 
+          completed, 
+          completionDate: completed ? new Date() : null,
+          xpEarned: completed ? xpEarned : 0
+        })
+        .where(eq(userMilestoneProgress.id, existingProgress.id))
+        .returning();
+      
+      // Add XP to user if milestone is newly completed
+      if (completed && !existingProgress.completed) {
+        await this.updateUserXp(userId, xpEarned);
+      }
+      
+      return updatedProgress;
+    } else {
+      const [newProgress] = await db
+        .insert(userMilestoneProgress)
+        .values({
+          userId,
+          milestoneId,
+          completed,
+          completionDate: completed ? new Date() : null,
+          xpEarned: completed ? xpEarned : 0
+        })
+        .returning();
+      
+      // Add XP to user if milestone is completed
+      if (completed) {
+        await this.updateUserXp(userId, xpEarned);
+      }
+      
+      return newProgress;
+    }
+  }
+  
+  async getUserCompletedMilestones(userId: number, courseId: number): Promise<number[]> {
+    // Get all milestones for this course
+    const milestones = await this.getCourseMilestones(courseId);
+    const milestoneIds = milestones.map(m => m.id);
+    
+    if (milestoneIds.length === 0) {
+      return [];
+    }
+    
+    // Get completed milestone progress entries
+    const completedProgress = await db
+      .select()
+      .from(userMilestoneProgress)
+      .where(
+        and(
+          eq(userMilestoneProgress.userId, userId),
+          inArray(userMilestoneProgress.milestoneId, milestoneIds),
+          eq(userMilestoneProgress.completed, true)
+        )
+      );
+    
+    return completedProgress.map(p => p.milestoneId);
+  }
+  
+  // Course content methods
+  async getCourseContent(courseId: number): Promise<CourseContent[]> {
+    return await db
+      .select()
+      .from(courseContent)
+      .where(eq(courseContent.courseId, courseId))
+      .orderBy(asc(courseContent.order));
+  }
+  
+  async getCourseContentById(id: number): Promise<CourseContent | undefined> {
+    const [content] = await db
+      .select()
+      .from(courseContent)
+      .where(eq(courseContent.id, id));
+    
+    return content;
+  }
+  
+  async createCourseContent(insertContent: InsertCourseContent): Promise<CourseContent> {
+    const [content] = await db
+      .insert(courseContent)
+      .values(insertContent)
+      .returning();
+    
+    return content;
   }
 
   // Contact message methods

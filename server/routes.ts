@@ -1,8 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertContactMessageSchema, insertBlogPostSchema, insertCourseMilestoneSchema } from "@shared/schema";
+import { insertUserSchema, insertContactMessageSchema, insertBlogPostSchema, insertCourseMilestoneSchema, insertCourseEnrollmentSchema } from "@shared/schema";
 import express from "express";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes with /api prefix
@@ -202,6 +209,240 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ message: error.message });
       } else {
         res.status(500).json({ message: "Failed to send message" });
+      }
+    }
+  });
+  
+  // Course recommendation routes
+  apiRouter.get("/courses/recommended", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 3;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Valid user ID is required" });
+      }
+      
+      const recommendedCourses = await storage.getRecommendedCourses(userId, limit);
+      res.json(recommendedCourses);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching recommended courses" });
+    }
+  });
+  
+  // Course enrollment routes
+  apiRouter.post("/courses/:courseId/enroll", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      
+      const userIdNum = parseInt(userId);
+      
+      // Check if user is already enrolled
+      const isEnrolled = await storage.isUserEnrolledInCourse(userIdNum, courseId);
+      if (isEnrolled) {
+        return res.status(400).json({ message: "User is already enrolled in this course" });
+      }
+      
+      const enrollmentData = {
+        userId: userIdNum,
+        courseId,
+        enrollmentDate: new Date(),
+        progress: 0,
+        status: "active"
+      };
+      
+      const validatedData = insertCourseEnrollmentSchema.parse(enrollmentData);
+      const enrollment = await storage.enrollUserInCourse(validatedData);
+      
+      res.status(201).json(enrollment);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to enroll in course" });
+      }
+    }
+  });
+  
+  apiRouter.get("/users/:userId/enrollments", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const enrollments = await storage.getUserEnrollments(userId);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching user enrollments" });
+    }
+  });
+  
+  apiRouter.get("/users/:userId/courses", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const courses = await storage.getUserCourses(userId);
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching user courses" });
+    }
+  });
+  
+  apiRouter.get("/courses/:courseId/enrollment-status", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : null;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      
+      const isEnrolled = await storage.isUserEnrolledInCourse(userId, courseId);
+      res.json({ isEnrolled });
+    } catch (error) {
+      res.status(500).json({ message: "Error checking enrollment status" });
+    }
+  });
+  
+  // User progress tracking
+  apiRouter.get("/users/:userId/milestones/:courseId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const courseId = parseInt(req.params.courseId);
+      const completedMilestones = await storage.getUserCompletedMilestones(userId, courseId);
+      res.json(completedMilestones);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching user progress" });
+    }
+  });
+  
+  apiRouter.post("/users/:userId/milestones/:milestoneId/complete", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const milestoneId = parseInt(req.params.milestoneId);
+      const { xpEarned } = req.body;
+      
+      const progress = await storage.updateUserMilestoneProgress(
+        userId, 
+        milestoneId, 
+        true, 
+        xpEarned || 10
+      );
+      
+      // Get updated user info with new XP and level
+      const user = await storage.getUser(userId);
+      
+      res.json({ progress, user });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to update milestone progress" });
+      }
+    }
+  });
+  
+  // Course content
+  apiRouter.get("/courses/:courseId/content", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      
+      // If userId provided, verify enrollment
+      if (userId) {
+        const isEnrolled = await storage.isUserEnrolledInCourse(userId, courseId);
+        if (!isEnrolled) {
+          return res.status(403).json({ message: "User not enrolled in this course" });
+        }
+      }
+      
+      const content = await storage.getCourseContent(courseId);
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching course content" });
+    }
+  });
+  
+  // Stripe payment routes
+  apiRouter.post("/create-payment-intent", async (req, res) => {
+    try {
+      const { amount, courseId, userId, metadata } = req.body;
+      
+      if (!amount || !courseId || !userId) {
+        return res.status(400).json({ message: "Amount, course ID, and user ID are required" });
+      }
+      
+      // Create a payment intent with Stripe
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          courseId: courseId.toString(),
+          userId: userId.toString(),
+          ...metadata
+        },
+      });
+      
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create payment intent" });
+      }
+    }
+  });
+  
+  apiRouter.post("/payment-success", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      
+      if (!paymentIntentId) {
+        return res.status(400).json({ message: "Payment intent ID is required" });
+      }
+      
+      // Verify payment was successful
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status !== "succeeded") {
+        return res.status(400).json({ message: "Payment has not succeeded" });
+      }
+      
+      const { userId, courseId } = paymentIntent.metadata;
+      
+      if (!userId || !courseId) {
+        return res.status(400).json({ message: "User ID or course ID missing from payment" });
+      }
+      
+      // Enroll the user in the course
+      const userIdNum = parseInt(userId);
+      const courseIdNum = parseInt(courseId);
+      
+      // Check if already enrolled
+      const isEnrolled = await storage.isUserEnrolledInCourse(userIdNum, courseIdNum);
+      
+      if (!isEnrolled) {
+        const enrollment = await storage.enrollUserInCourse({
+          userId: userIdNum,
+          courseId: courseIdNum,
+          enrollmentDate: new Date(),
+          progress: 0,
+          status: "active"
+        });
+        
+        res.json({ success: true, enrollment });
+      } else {
+        res.json({ success: true, message: "User already enrolled" });
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to process payment success" });
       }
     }
   });

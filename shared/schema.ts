@@ -8,6 +8,16 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
   fullName: text("full_name"),
+  role: text("role").default("student"),
+  xpPoints: integer("xp_points").default(0),
+  level: integer("level").default(1),
+  badges: jsonb("badges").default([]),
+  avatar: text("avatar"),
+  bio: text("bio"),
+  preferences: jsonb("preferences").default({}),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -15,6 +25,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   email: true,
   fullName: true,
+  role: true,
+  avatar: true,
+  bio: true,
 });
 
 export const courses = pgTable("courses", {
@@ -60,6 +73,78 @@ export const insertCourseMilestoneSchema = createInsertSchema(courseMilestones).
   imagePath: true,
   achievementBadge: true,
   shareableText: true,
+});
+
+// User enrollments
+export const courseEnrollments = pgTable("course_enrollments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  courseId: integer("course_id").notNull(),
+  status: text("status").default("active"),
+  enrollmentDate: timestamp("enrollment_date").defaultNow(),
+  completionDate: timestamp("completion_date"),
+  progress: integer("progress").default(0),
+  certificateIssued: boolean("certificate_issued").default(false),
+  paymentId: text("payment_id"),
+  paymentAmount: integer("payment_amount"),
+  paymentCurrency: text("payment_currency"),
+  paymentStatus: text("payment_status"),
+});
+
+export const insertCourseEnrollmentSchema = createInsertSchema(courseEnrollments).pick({
+  userId: true,
+  courseId: true,
+  status: true,
+  enrollmentDate: true,
+  progress: true,
+  paymentId: true,
+  paymentAmount: true,
+  paymentCurrency: true,
+  paymentStatus: true,
+});
+
+// User milestone progress
+export const userMilestoneProgress = pgTable("user_milestone_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  milestoneId: integer("milestone_id").notNull(),
+  completed: boolean("completed").default(false),
+  completionDate: timestamp("completion_date"),
+  xpEarned: integer("xp_earned").default(0),
+});
+
+export const insertUserMilestoneProgressSchema = createInsertSchema(userMilestoneProgress).pick({
+  userId: true,
+  milestoneId: true,
+  completed: true,
+  xpEarned: true,
+});
+
+// Course content
+export const courseContent = pgTable("course_content", {
+  id: serial("id").primaryKey(),
+  courseId: integer("course_id").notNull(),
+  title: text("title").notNull(),
+  contentType: text("content_type").notNull(), // video, text, quiz, assignment
+  order: integer("order").notNull(),
+  content: text("content"),
+  videoUrl: text("video_url"),
+  duration: integer("duration"), // in minutes
+  quizData: jsonb("quiz_data"),
+  xpReward: integer("xp_reward").default(10),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCourseContentSchema = createInsertSchema(courseContent).pick({
+  courseId: true,
+  title: true,
+  contentType: true,
+  order: true,
+  content: true,
+  videoUrl: true,
+  duration: true,
+  quizData: true,
+  xpReward: true,
 });
 
 export const contactMessages = pgTable("contact_messages", {
@@ -114,3 +199,12 @@ export type BlogPost = typeof blogPosts.$inferSelect;
 
 export type InsertCourseMilestone = z.infer<typeof insertCourseMilestoneSchema>;
 export type CourseMilestone = typeof courseMilestones.$inferSelect;
+
+export type InsertCourseEnrollment = z.infer<typeof insertCourseEnrollmentSchema>;
+export type CourseEnrollment = typeof courseEnrollments.$inferSelect;
+
+export type InsertUserMilestoneProgress = z.infer<typeof insertUserMilestoneProgressSchema>;
+export type UserMilestoneProgress = typeof userMilestoneProgress.$inferSelect;
+
+export type InsertCourseContent = z.infer<typeof insertCourseContentSchema>;
+export type CourseContent = typeof courseContent.$inferSelect;
