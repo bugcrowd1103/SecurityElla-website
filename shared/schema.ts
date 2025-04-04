@@ -60,7 +60,9 @@ export const blogPosts = pgTable("blog_posts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
+  summary: text("summary"),
   author: text("author").notNull(),
+  readTime: integer("read_time"),
   imagePath: text("image_path"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -69,7 +71,9 @@ export const blogPosts = pgTable("blog_posts", {
 export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
   title: true,
   content: true,
+  summary: true,
   author: true,
+  readTime: true,
   imagePath: true,
   createdAt: true,
 });

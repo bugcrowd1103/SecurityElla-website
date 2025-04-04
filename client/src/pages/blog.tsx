@@ -1,112 +1,112 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Helmet } from "react-helmet";
-import { format } from "date-fns";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Helmet } from "react-helmet";
+import { Calendar, Clock, ArrowRight } from "lucide-react";
 import type { BlogPost } from "@shared/schema";
 
 export default function Blog() {
-  const { data: blogPosts, isLoading, isError } = useQuery<BlogPost[]>({
+  const [, setLocation] = useLocation();
+
+  const { data: posts, isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
   });
+
+  const formatDate = (dateString: Date | string | null) => {
+    if (!dateString) return 'Unknown date';
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  };
 
   return (
     <>
       <Helmet>
         <title>Blog | SecurityElla</title>
-        <meta name="description" content="Read the latest cybersecurity insights, tips, and trends on the SecurityElla blog." />
+        <meta name="description" content="Latest articles and insights on cybersecurity, trends, threats, and best practices from SecurityElla experts." />
       </Helmet>
 
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">SecurityElla Blog</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest cybersecurity insights, tips, and industry trends.
+            Latest articles and insights on cybersecurity, trends, threats, and best practices.
           </p>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i} className="overflow-hidden flex flex-col h-full">
-                <div className="w-full h-48 bg-gray-200">
-                  <Skeleton className="w-full h-full" />
-                </div>
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-3/4" />
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-10 w-1/2" />
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        ) : isError ? (
-          <div className="text-center py-12">
-            <h3 className="text-xl text-gray-700 mb-4">
-              There was an error loading the blog posts.
-            </h3>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </div>
-        ) : blogPosts && blogPosts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
-              <Card key={post.id} className="overflow-hidden flex flex-col h-full border border-gray-200 transition duration-300 hover:shadow-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {isLoading ? (
+            // Skeleton loaders for blog posts
+            Array(6)
+              .fill(null)
+              .map((_, i) => (
+                <Card key={i} className="border-blue-100">
+                  <Skeleton className="h-48 w-full rounded-t-lg" />
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-3 mb-3">
+                      <Skeleton className="h-5 w-24" />
+                    </div>
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-2/3 mb-4" />
+                    <div className="flex justify-between items-center mt-4">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-9 w-24" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+          ) : posts && posts.length > 0 ? (
+            posts.map((post, index) => (
+              <Card 
+                key={post.id} 
+                className="border-blue-100 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-lg"
+              >
                 {post.imagePath && (
-                  <div className="w-full h-48 overflow-hidden">
+                  <div className="h-48 overflow-hidden">
                     <img 
                       src={post.imagePath} 
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      alt={post.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                 )}
-                <CardHeader>
-                  <CardTitle className="text-xl text-blue-600">{post.title}</CardTitle>
-                  <CardDescription>
-                    <div className="flex justify-between mt-2 text-gray-500 text-sm">
-                      <span>By {post.author}</span>
-                      <span>{post.createdAt ? format(new Date(post.createdAt), 'MMMM dd, yyyy') : ''}</span>
-                    </div>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-gray-700 line-clamp-3">
-                    {post.content.substring(0, 150)}
-                    {post.content.length > 150 ? '...' : ''}
-                  </p>
+                <CardContent className="p-6 flex-grow flex flex-col">
+                  <div className="flex flex-wrap gap-3 mb-3">
+                    <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full flex items-center">
+                      <Calendar size={14} className="mr-1" /> {formatDate(post.createdAt)}
+                    </span>
+                    {post.readTime && (
+                      <span className="text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full flex items-center">
+                        <Clock size={14} className="mr-1" /> {post.readTime} min read
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{post.title}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">{post.summary || post.content.substring(0, 120) + '...'}</p>
+                  <Button 
+                    variant="outline"
+                    className="mt-2 border-blue-200 text-blue-600 hover:bg-blue-50 self-start flex items-center"
+                    onClick={() => setLocation(`/blog/${post.id}`)}
+                  >
+                    Read More <ArrowRight size={16} className="ml-2" />
+                  </Button>
                 </CardContent>
-                <CardFooter>
-                  <Link href={`/blog/${post.id}`}>
-                    <Button 
-                      variant="outline" 
-                      className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                    >
-                      Read More
-                    </Button>
-                  </Link>
-                </CardFooter>
               </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <h3 className="text-xl text-gray-700 mb-4">
-              No blog posts available at the moment.
-            </h3>
-            <p className="text-gray-600">
-              Please check back later for new cybersecurity insights.
-            </p>
-          </div>
-        )}
+            ))
+          ) : (
+            <div className="col-span-3 text-center py-12">
+              <h3 className="text-xl font-medium text-gray-700 mb-4">No blog posts found</h3>
+              <p className="text-gray-600 mb-6">Check back soon for new content!</p>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

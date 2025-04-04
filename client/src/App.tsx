@@ -4,6 +4,7 @@ import Footer from "./components/layout/Footer";
 import Home from "./pages/home";
 import Services from "./pages/services";
 import Courses from "./pages/courses";
+import CourseDetail from "./pages/course-detail";
 import About from "./pages/about";
 import Login from "./pages/login";
 import NotFound from "./pages/not-found";
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" component={Home} />
           <Route path="/services" component={Services} />
           <Route path="/courses" component={Courses} />
+          <Route path="/courses/:id" component={CourseDetail} />
           <Route path="/about" component={About} />
           <Route path="/login" component={Login} />
           <Route path="/blog" component={Blog} />

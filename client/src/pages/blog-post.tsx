@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams, useLocation } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Helmet } from "react-helmet";
-import { format } from "date-fns";
-import { ArrowLeft } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, User } from "lucide-react";
 import type { BlogPost } from "@shared/schema";
 
 export default function BlogPostPage() {
@@ -17,18 +17,28 @@ export default function BlogPostPage() {
     enabled: !!postId,
   });
 
+  const formatDate = (dateString: Date | string | null) => {
+    if (!dateString) return 'Unknown date';
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  };
+
   if (isError) {
     return (
       <div className="container mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Blog Post Not Found</h1>
         <p className="text-xl text-gray-600 mb-8">
-          The blog post you're looking for doesn't exist or has been removed.
+          The article you're looking for doesn't exist or has been removed.
         </p>
         <Button 
           className="bg-blue-600 hover:bg-blue-700 text-white" 
           onClick={() => setLocation("/blog")}
         >
-          Back to Blog
+          Return to Blog
         </Button>
       </div>
     );
@@ -37,93 +47,91 @@ export default function BlogPostPage() {
   return (
     <>
       <Helmet>
-        <title>{post ? `${post.title} | SecurityElla Blog` : 'Loading Post... | SecurityElla Blog'}</title>
-        <meta name="description" content={post?.content.substring(0, 150) || "Loading blog post..."} />
+        <title>{post ? `${post.title} | SecurityElla Blog` : 'Loading Article... | SecurityElla Blog'}</title>
+        <meta name="description" content={post?.summary || "Loading article..."} />
       </Helmet>
 
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Button 
-            variant="outline"
-            className="mb-6 flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
-            onClick={() => setLocation("/blog")}
-          >
-            <ArrowLeft size={18} /> Back to All Posts
-          </Button>
+        <Button 
+          variant="outline"
+          className="mb-6 flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+          onClick={() => setLocation("/blog")}
+        >
+          <ArrowLeft size={18} /> Back to Blog
+        </Button>
 
-          {isLoading ? (
-            <>
-              <Skeleton className="h-8 w-3/4 mb-4" />
-              <div className="flex gap-4 mb-8">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-              <Skeleton className="w-full h-64 mb-8" />
-              <div className="space-y-4">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            </>
-          ) : post ? (
-            <article className="max-w-4xl mx-auto">
+        {isLoading ? (
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-8 w-3/4 mb-4" />
+            <div className="flex gap-4 mb-8">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-6 w-32" />
+            </div>
+            <Skeleton className="h-64 w-full mb-8 rounded-lg" />
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+        ) : post ? (
+          <article className="max-w-4xl mx-auto">
+            <header className="mb-8">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
               
-              <div className="flex flex-wrap gap-4 text-gray-600 mb-8">
-                <span className="flex items-center">By {post.author}</span>
-                <span className="flex items-center">
-                  {post.createdAt && format(new Date(post.createdAt), 'MMMM dd, yyyy')}
-                </span>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+                <div className="flex items-center">
+                  <User size={16} className="mr-2 text-blue-600" />
+                  <span>{post.author || "SecurityElla Team"}</span>
+                </div>
+                <div className="flex items-center">
+                  <Calendar size={16} className="mr-2 text-blue-600" />
+                  <span>{formatDate(post.createdAt)}</span>
+                </div>
+                {post.readTime && (
+                  <div className="flex items-center">
+                    <Clock size={16} className="mr-2 text-blue-600" />
+                    <span>{post.readTime} min read</span>
+                  </div>
+                )}
               </div>
 
               {post.imagePath && (
-                <div className="w-full mb-8 rounded-lg overflow-hidden shadow-md">
+                <div className="mb-8 rounded-lg overflow-hidden shadow-md">
                   <img 
                     src={post.imagePath} 
-                    alt={post.title}
+                    alt={post.title} 
                     className="w-full h-auto object-cover"
                   />
                 </div>
               )}
+            </header>
 
-              <div className="prose prose-blue lg:prose-lg max-w-none">
-                {post.content.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-gray-700 leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
+            <div className="prose prose-blue lg:prose-lg max-w-none">
+              {post.content.split('\n\n').map((paragraph, index) => (
+                <p key={index} className="mb-4 text-gray-700 leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Share this article</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                  Share on Twitter
+                </Button>
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                  Share on LinkedIn
+                </Button>
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                  Share on Facebook
+                </Button>
               </div>
-              
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Share this article</h3>
-                <div className="flex gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                    onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`, '_blank')}
-                  >
-                    Twitter
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                    onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank')}
-                  >
-                    LinkedIn
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                    onClick={() => window.open(`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`Check out this article: ${window.location.href}`)}`, '_blank')}
-                  >
-                    Email
-                  </Button>
-                </div>
-              </div>
-            </article>
-          ) : null}
-        </div>
+            </div>
+          </article>
+        ) : null}
       </div>
     </>
   );

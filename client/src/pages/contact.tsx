@@ -40,10 +40,7 @@ export default function Contact() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (values: FormValues) => {
-      return apiRequest("/api/contact", {
-        method: "POST", 
-        body: JSON.stringify(values)
-      });
+      return apiRequest("/api/contact", "POST", values);
     },
     onSuccess: () => {
       toast({
