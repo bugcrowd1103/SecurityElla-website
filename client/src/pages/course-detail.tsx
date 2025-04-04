@@ -184,7 +184,7 @@ export default function CourseDetail() {
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => setIsEnrollmentModalOpen(true)}
                     >
-                      Enroll Now
+                      Enroll Now - ${course.priceUsd}
                     </Button>
                     
                     <Button 

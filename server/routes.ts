@@ -53,15 +53,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/courses/:courseId/milestones", async (req, res) => {
     try {
       const courseId = parseInt(req.params.courseId);
+      
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID" });
+      }
+      
       const course = await storage.getCourseById(courseId);
       
       if (!course) {
         return res.status(404).json({ message: "Course not found" });
       }
       
-      const milestones = await storage.getCourseMilestones(courseId);
-      res.json(milestones);
+      // Try-catch within this function to better handle errors
+      try {
+        const milestones = await storage.getCourseMilestones(courseId);
+        res.json(milestones);
+      } catch (milestoneErr) {
+        console.error("Error fetching milestones:", milestoneErr);
+        // Return an empty array instead of error to avoid UI breaks
+        res.json([]);
+      }
     } catch (error) {
+      console.error("Error in course milestones route:", error);
       res.status(500).json({ message: "Error fetching course milestones" });
     }
   });
@@ -294,14 +307,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const courseId = parseInt(req.params.courseId);
       const userId = req.query.userId ? parseInt(req.query.userId as string) : null;
       
-      if (!userId) {
-        return res.status(400).json({ message: "User ID is required" });
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID" });
       }
       
-      const isEnrolled = await storage.isUserEnrolledInCourse(userId, courseId);
-      res.json({ isEnrolled });
+      if (!userId || isNaN(userId)) {
+        // Instead of error, return not enrolled for invalid users
+        return res.json({ isEnrolled: false });
+      }
+      
+      try {
+        const isEnrolled = await storage.isUserEnrolledInCourse(userId, courseId);
+        res.json({ isEnrolled });
+      } catch (enrollErr) {
+        console.error("Error checking enrollment:", enrollErr);
+        // Default to not enrolled on error to avoid UI breaks
+        res.json({ isEnrolled: false });
+      }
     } catch (error) {
-      res.status(500).json({ message: "Error checking enrollment status" });
+      console.error("Error in enrollment status route:", error);
+      // Return default response instead of error to prevent UI issues
+      res.json({ isEnrolled: false });
     }
   });
   

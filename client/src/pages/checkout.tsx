@@ -16,7 +16,13 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CheckoutForm = ({ courseTitle }: { courseTitle: string }) => {
+interface CheckoutFormProps {
+  courseTitle: string;
+  courseId: number;
+  userId: number;
+}
+
+const CheckoutForm = ({ courseTitle, courseId, userId }: CheckoutFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
@@ -27,6 +33,11 @@ const CheckoutForm = ({ courseTitle }: { courseTitle: string }) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
+      toast({
+        title: "Payment Error",
+        description: "Stripe not loaded properly. Please refresh the page and try again.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -36,12 +47,13 @@ const CheckoutForm = ({ courseTitle }: { courseTitle: string }) => {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + "/payment-success",
+          return_url: window.location.origin + `/payment-success?courseId=${courseId}&userId=${userId}`,
         },
         redirect: "if_required",
       });
 
       if (error) {
+        console.error("Payment error:", error);
         toast({
           title: "Payment Failed",
           description: error.message || "An error occurred during payment",
@@ -56,14 +68,25 @@ const CheckoutForm = ({ courseTitle }: { courseTitle: string }) => {
         });
         
         // Process successful payment on the server
-        await apiRequest("POST", "/api/payment-success", { 
-          paymentIntentId: paymentIntent.id 
-        });
-        
-        // Redirect to course page
-        setLocation('/dashboard');
+        try {
+          await apiRequest("POST", "/api/payment-success", { 
+            paymentIntentId: paymentIntent.id 
+          });
+          
+          // Redirect to success page with query params
+          window.location.href = `/payment-success?courseId=${courseId}&userId=${userId}`;
+        } catch (apiError) {
+          console.error("Error processing payment success:", apiError);
+          toast({
+            title: "Enrollment Issue",
+            description: "Payment successful, but we had trouble enrolling you. Please contact support.",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        }
       }
     } catch (err: any) {
+      console.error("Payment error:", err);
       toast({
         title: "Payment Error",
         description: err.message || "An unexpected error occurred",
@@ -106,9 +129,11 @@ export default function Checkout() {
     const fetchData = async () => {
       try {
         // Get course ID and user ID from URL params
-        const params = new URLSearchParams(location.split('?')[1]);
+        const params = new URLSearchParams(window.location.search);
         const courseId = params.get('courseId');
         const userId = params.get('userId');
+        
+        console.log("URL params:", { courseId, userId, fullUrl: window.location.href });
         
         if (!courseId || !userId) {
           setError("Missing course or user information");
@@ -149,7 +174,7 @@ export default function Checkout() {
     };
 
     fetchData();
-  }, [location, toast]);
+  }, [toast]);
 
   if (isLoading) {
     return (
@@ -210,7 +235,11 @@ export default function Checkout() {
           </div>
           
           <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm courseTitle={course.title} />
+            <CheckoutForm 
+              courseTitle={course.title} 
+              courseId={course.id} 
+              userId={parseInt(new URLSearchParams(window.location.search).get('userId') || '0')} 
+            />
           </Elements>
         </CardContent>
         <CardFooter className="flex justify-center border-t pt-4">

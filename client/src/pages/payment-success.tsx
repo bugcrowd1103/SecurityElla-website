@@ -15,11 +15,26 @@ export default function PaymentSuccess() {
   useEffect(() => {
     const processPayment = async () => {
       try {
-        // Get the payment_intent and payment_intent_client_secret from URL
+        // Get params from URL - we may have multiple possible formats
         const urlParams = new URLSearchParams(window.location.search);
         const paymentIntentId = urlParams.get('payment_intent');
+        const courseId = urlParams.get('courseId');
+        const userId = urlParams.get('userId');
+        
+        console.log("Payment success params:", { paymentIntentId, courseId, userId });
         
         if (!paymentIntentId) {
+          // If no payment_intent, this may be a redirect from our custom URL with courseId/userId
+          if (courseId && userId) {
+            // We've already processed the payment on the checkout page
+            toast({
+              title: "Enrollment Complete!",
+              description: "You have been successfully enrolled in the course.",
+            });
+            setIsProcessing(false);
+            return;
+          }
+          
           setError("Payment information missing");
           setIsProcessing(false);
           return;

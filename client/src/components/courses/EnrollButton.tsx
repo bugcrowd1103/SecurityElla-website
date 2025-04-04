@@ -75,9 +75,10 @@ export function EnrollButton({ course, userId, isEnrolled = false, onSuccess }: 
   const handlePaidEnrollment = () => {
     if (!userId) return;
     
-    // For paid courses, redirect to checkout
+    // For paid courses, redirect to checkout with proper URL parameters
     setIsDialogOpen(false);
-    setLocation(`/checkout?courseId=${course.id}&userId=${userId}`);
+    // Using window.location.href to avoid routing issues with parameters
+    window.location.href = `/checkout?courseId=${course.id}&userId=${userId}`;
   };
 
   if (isEnrolled) {
