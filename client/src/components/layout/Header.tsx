@@ -84,13 +84,12 @@ const Header = () => {
           </div>
           
           <div className="hidden sm:flex sm:items-center">
-            <Link href="/login">
-              <Button 
-                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out"
-              >
-                Login
-              </Button>
-            </Link>
+            <Button 
+              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out"
+              onClick={() => window.location.href = '/login'}
+            >
+              Login
+            </Button>
           </div>
           
           <div className="flex items-center sm:hidden">

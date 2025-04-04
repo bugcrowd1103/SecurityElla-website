@@ -171,11 +171,24 @@ export default function CourseDetail() {
                   </div>
 
                   <div className="space-y-4">
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={() => {
+                        // In a real app, this would redirect to enrollment page or open a modal
+                        alert('Enrollment functionality will be implemented in the future!');
+                      }}
+                    >
                       Enroll Now
                     </Button>
                     
-                    <Button variant="outline" className="w-full border-blue-200 text-blue-600 hover:bg-blue-50">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                      onClick={() => {
+                        // In a real app, this would add the course to user's wishlist
+                        alert('Wishlist functionality will be implemented in the future!');
+                      }}
+                    >
                       Add to Wishlist
                     </Button>
                   </div>

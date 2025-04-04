@@ -120,10 +120,8 @@ const FeaturedCourses = () => {
                       <span className="text-blue-600 font-bold text-lg">₹{course.priceInr.toLocaleString()}</span>
                       <span className="text-gray-500 text-sm"> / ${course.priceUsd}</span>
                     </div>
-                    <Link href={`/courses/${course.id}`}>
-                      <a className="text-blue-600 hover:text-blue-800 transition duration-300 flex items-center">
-                        View Details <i className="fas fa-arrow-right ml-2"></i>
-                      </a>
+                    <Link href={`/courses/${course.id}`} className="text-blue-600 hover:text-blue-800 transition duration-300 flex items-center">
+                      View Details <i className="fas fa-arrow-right ml-2"></i>
                     </Link>
                   </div>
                 </div>
@@ -133,13 +131,12 @@ const FeaturedCourses = () => {
         )}
         
         <div className="text-center mt-10">
-          <Link href="/courses">
-            <Button 
-              className="inline-block px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition duration-300 ease-in-out"
-            >
-              View All Courses
-            </Button>
-          </Link>
+          <Button
+            className="inline-block px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition duration-300 ease-in-out"
+            onClick={() => window.location.href = '/courses'}
+          >
+            View All Courses
+          </Button>
         </div>
       </div>
     </div>
