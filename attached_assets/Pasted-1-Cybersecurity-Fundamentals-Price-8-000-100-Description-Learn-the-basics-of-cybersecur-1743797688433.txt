@@ -1,0 +1,54 @@
+1. Cybersecurity Fundamentals
+•	Price: ₹8,000 / $100
+•	Description: Learn the basics of cybersecurity, including network security, encryption, and threat mitigation.
+2. Ethical Hacking
+•	Price: ₹12,000 / $150
+•	Description: Explore ethical hacking techniques and learn to identify and exploit vulnerabilities in computer systems.
+3. Kali Linux
+•	Price: ₹10,000 / $125
+•	Description: Master Kali Linux, the OS used for penetration testing, and learn how to use its tools for security assessments.
+4. Network Security
+•	Price: ₹12,000 / $150
+•	Description: Learn essential network security concepts such as firewalls, VPNs, and IDS/IPS systems.
+5. Wireless Network Security
+•	Price: ₹9,000 / $110
+•	Description: Understand how to secure wireless networks and protect against common wireless attacks like rogue access points.
+6. Web Application Security
+•	Price: ₹11,000 / $140
+•	Description: Learn to secure web applications from threats like SQL injection, XSS, and CSRF.
+7. Penetration Testing
+•	Price: ₹14,000 / $175
+•	Description: Develop hands-on skills in penetration testing to identify and exploit vulnerabilities in systems and applications.
+8. Bug Bounty Hunting
+•	Price: ₹10,000 / $125
+•	Description: Discover how to find vulnerabilities in websites and earn rewards by participating in bug bounty programs.
+9. Digital Forensics
+•	Price: ₹15,000 / $190
+•	Description: Learn how to investigate and recover data from compromised systems to uncover cybercrime.
+10. Advanced Ethical Hacking Techniques
+•	Price: ₹18,000 / $225
+•	Description: Dive deeper into advanced hacking techniques and exploit complex vulnerabilities.
+11. Red Teaming and Blue Teaming
+•	Price: ₹15,000 / $190
+•	Description: Learn both offensive and defensive strategies to simulate real-world cyber attacks and responses.
+12. Red Team vs Blue Team Training (Advanced)
+•	Price: ₹20,000 / $250
+•	Description: Take your Red Team and Blue Team skills to the next level with advanced tactics and real-world simulations.
+13. Cybersecurity Risk Management
+•	Price: ₹12,000 / $150
+•	Description: Understand risk assessment, mitigation strategies, and how to manage cybersecurity risks effectively.
+14. Artificial Intelligence (AI) in Cybersecurity
+•	Price: ₹17,000 / $215
+•	Description: Explore the use of AI and machine learning in detecting and responding to cybersecurity threats.
+15. Deep Web and Dark Web Investigation
+•	Price: ₹12,500 / $160
+•	Description: Learn how to investigate the Deep Web and Dark Web for cybercriminal activity and data leaks.
+16. Cybersecurity for Startups
+•	Price: ₹9,000 / $115
+•	Description: Discover cost-effective security practices designed specifically for startups and small businesses.
+17. Cybersecurity Leadership and Management
+•	Price: ₹22,000 / $275
+•	Description: Learn how to lead and manage cybersecurity teams, build security policies, and drive organizational change.
+18. Cyber Security Expert
+   Price: 35000/$500
+    Description: same as old website
