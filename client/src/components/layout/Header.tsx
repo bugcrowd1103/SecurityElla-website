@@ -56,12 +56,28 @@ const Header = () => {
                   Courses
                 </span>
               </Link>
+              <Link href="/blog">
+                <span className={cn(
+                  "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                  isActive("/blog") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
+                )}>
+                  Blog
+                </span>
+              </Link>
               <Link href="/about">
                 <span className={cn(
                   "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
                   isActive("/about") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
                 )}>
                   About
+                </span>
+              </Link>
+              <Link href="/contact">
+                <span className={cn(
+                  "px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                  isActive("/contact") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
+                )}>
+                  Contact
                 </span>
               </Link>
             </div>
@@ -124,6 +140,17 @@ const Header = () => {
               Courses
             </span>
           </Link>
+          <Link href="/blog">
+            <span 
+              className={cn(
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/blog") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
+              )}
+              onClick={closeMobileMenu}
+            >
+              Blog
+            </span>
+          </Link>
           <Link href="/about">
             <span 
               className={cn(
@@ -133,6 +160,17 @@ const Header = () => {
               onClick={closeMobileMenu}
             >
               About
+            </span>
+          </Link>
+          <Link href="/contact">
+            <span 
+              className={cn(
+                "block px-3 py-2 transition duration-300 ease-in-out font-medium cursor-pointer",
+                isActive("/contact") ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
+              )}
+              onClick={closeMobileMenu}
+            >
+              Contact
             </span>
           </Link>
           <Link href="/login">

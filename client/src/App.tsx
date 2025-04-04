@@ -7,10 +7,13 @@ import Courses from "./pages/courses";
 import About from "./pages/about";
 import Login from "./pages/login";
 import NotFound from "./pages/not-found";
+import Blog from "./pages/blog";
+import BlogPost from "./pages/blog-post";
+import Contact from "./pages/contact";
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-gray-200 font-['Inter',sans-serif]">
+    <div className="flex flex-col min-h-screen bg-white text-gray-800 font-['Inter',sans-serif]">
       <Header />
       <main className="flex-grow">
         <Switch>
@@ -19,6 +22,9 @@ function App() {
           <Route path="/courses" component={Courses} />
           <Route path="/about" component={About} />
           <Route path="/login" component={Login} />
+          <Route path="/blog" component={Blog} />
+          <Route path="/blog/:id" component={BlogPost} />
+          <Route path="/contact" component={Contact} />
           <Route component={NotFound} />
         </Switch>
       </main>

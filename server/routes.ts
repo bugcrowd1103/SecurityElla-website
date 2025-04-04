@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertContactMessageSchema } from "@shared/schema";
+import { insertUserSchema, insertContactMessageSchema, insertBlogPostSchema } from "@shared/schema";
 import express from "express";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -39,6 +39,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(course);
     } catch (error) {
       res.status(500).json({ message: "Error fetching course" });
+    }
+  });
+
+  // Blog post routes
+  apiRouter.get("/blog", async (req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching blog posts" });
+    }
+  });
+
+  apiRouter.get("/blog/recent", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 3;
+      const recentPosts = await storage.getRecentBlogPosts(limit);
+      res.json(recentPosts);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching recent blog posts" });
+    }
+  });
+
+  apiRouter.get("/blog/:id", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const post = await storage.getBlogPostById(postId);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching blog post" });
+    }
+  });
+
+  apiRouter.post("/blog", async (req, res) => {
+    try {
+      const validatedData = insertBlogPostSchema.parse(req.body);
+      const newPost = await storage.createBlogPost(validatedData);
+      res.status(201).json(newPost);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create blog post" });
+      }
     }
   });
 
