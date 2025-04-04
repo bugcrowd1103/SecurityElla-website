@@ -142,8 +142,8 @@ export default function Checkout() {
         }
 
         // Fetch course details
-        const courseData = await apiRequest("GET", `/api/courses/${courseId}`);
-        const courseJson = await courseData.json();
+        const courseRes = await apiRequest("GET", `/api/courses/${courseId}`);
+        const courseJson = await courseRes.json();
         setCourse(courseJson);
         
         // Create payment intent
