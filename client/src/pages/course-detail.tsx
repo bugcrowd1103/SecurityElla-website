@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -7,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Helmet } from "react-helmet";
 import { ArrowLeft, Clock, DollarSign, Layers, Award, Flag } from "lucide-react";
 import type { Course } from "@shared/schema";
+import EnrollmentModal from "@/components/courses/EnrollmentModal";
 
 export default function CourseDetail() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const courseId = params.id;
+  const [isEnrollmentModalOpen, setIsEnrollmentModalOpen] = useState(false);
 
   const { data: course, isLoading, isError } = useQuery<Course>({
     queryKey: [`/api/courses/${courseId}`],
@@ -173,10 +176,7 @@ export default function CourseDetail() {
                   <div className="space-y-4">
                     <Button 
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() => {
-                        // In a real app, this would redirect to enrollment page or open a modal
-                        alert('Enrollment functionality will be implemented in the future!');
-                      }}
+                      onClick={() => setIsEnrollmentModalOpen(true)}
                     >
                       Enroll Now
                     </Button>
@@ -222,6 +222,14 @@ export default function CourseDetail() {
           </div>
         ) : null}
       </div>
+
+      {course && (
+        <EnrollmentModal
+          course={course}
+          isOpen={isEnrollmentModalOpen}
+          onClose={() => setIsEnrollmentModalOpen(false)}
+        />
+      )}
     </>
   );
 }
